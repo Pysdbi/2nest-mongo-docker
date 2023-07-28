@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  nest-auth:
+    build: services/auth
+    container_name: nest-auth
+    depends_on:
+      - mongo-auth
+    ports:
+      - "3001:3000"
+
+  nest-todos:
+    build: services/todos
+    container_name: nest-todos
+    depends_on:
+      - mongo-todos
+      - nest-auth
+    restart: always
+    ports:
+      - "3000:3000"
+
+
+  mongo-auth:
+    image: 'bitnami/mongodb:latest'
+    container_name: mongo-auth
+    volumes:
+      - mongodata-auth:/bitnami/mongodb
+    env_file:
+      - mongo/.env.auth
+
+  mongo-todos:
+    image: 'bitnami/mongodb:latest'
+    container_name: mongo-todos
+    restart: always
+    volumes:
+      - mongodata-todos:/bitnami/mongodb
+    env_file:
+      - mongo/.env.todos
+
+volumes:
+  mongodata-auth:
+  mongodata-todos:
